@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:archimate="http://www.opengroup.org/xsd/archimate/3.0/"
+                 name="fintran"
+                 version="1.0">
+
+  <!-- ============================================================
+       MOTIVATION
+       ============================================================ -->
+  <elements>
+
+    <element xsi:type="archimate:Goal" id="goal-1"
+             name="Transform financial documents between formats"
+             documentation="fintran enables format-agnostic transformation of financial data (journals, trial balances, spreadsheets) across tools like hledger, Twinfield, Excel, and DuckDB."/>
+
+  </elements>
+
+  <!-- ============================================================
+       APPLICATION LAYER
+       ============================================================ -->
+  <elements>
+
+    <!-- Application Components -->
+    <element xsi:type="archimate:ApplicationComponent" id="comp-cli"
+             name="CLI"
+             documentation="Cyclopts-based command-line interface. Entry point for all fintran operations. Accepts --from, --to, input file, and -o output flags."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-core"
+             name="Core"
+             documentation="Defines the Intermediate Representation (IR) schema and orchestrates the reader → transform → writer pipeline."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-readers"
+             name="Readers"
+             documentation="Collection of format-specific reader modules. Each reader parses a source file and returns a normalized Polars DataFrame (IR)."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-writers"
+             name="Writers"
+             documentation="Collection of format-specific writer modules. Each writer serializes the IR to a target format."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-transforms"
+             name="Transforms"
+             documentation="Optional enrichment steps applied between reader and writer. Examples: account code mapping, currency normalization, sign convention adjustment."/>
+
+    <!-- Reader sub-components -->
+    <element xsi:type="archimate:ApplicationComponent" id="comp-reader-csv"
+             name="CSV Reader"
+             documentation="Reads generic CSV files into the IR. Uses DuckDB for ingestion."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-reader-hledger"
+             name="hledger Reader"
+             documentation="Parses hledger .journal files into the IR. Flattens multi-posting transactions to one row per posting."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-reader-excel"
+             name="Excel Reader"
+             documentation="Reads .xlsx files into the IR. Requires --sheet flag to identify the target sheet."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-reader-twinfield"
+             name="Twinfield Reader"
+             documentation="Reads Twinfield CSV exports (transaction list or trial balance) into the IR. Normalizes Twinfield debit/credit sign convention."/>
+
+    <!-- Writer sub-components -->
+    <element xsi:type="archimate:ApplicationComponent" id="comp-writer-csv"
+             name="CSV Writer"
+             documentation="Serializes the IR to a flat CSV file."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-writer-hledger"
+             name="hledger Writer"
+             documentation="Serializes the IR to hledger .journal format."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-writer-excel"
+             name="Excel Writer"
+             documentation="Serializes the IR to an .xlsx file."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-writer-twinfield"
+             name="Twinfield Writer"
+             documentation="Serializes the IR to Twinfield import CSV format, including required column names, date formats, and office codes."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-writer-duckdb"
+             name="DuckDB Writer"
+             documentation="Writes the IR to a DuckDB table (default: balances). Supports append and upsert modes."/>
+
+    <!-- Application Services -->
+    <element xsi:type="archimate:ApplicationService" id="svc-transform"
+             name="Transform Service"
+             documentation="Orchestrates the full reader → transform → writer pipeline for a given --from / --to combination."/>
+
+    <element xsi:type="archimate:ApplicationService" id="svc-validate"
+             name="Validation Service"
+             documentation="Validates IR schema compliance after reading. Rejects malformed input early with a descriptive error."/>
+
+    <!-- Data Objects -->
+    <element xsi:type="archimate:DataObject" id="do-ir"
+             name="Intermediate Representation (IR)"
+             documentation="Canonical Polars DataFrame with fields: date (Date), account (Utf8), amount (Decimal), currency (Utf8), description (Utf8, optional), reference (Utf8, optional)."/>
+
+    <element xsi:type="archimate:DataObject" id="do-csv"
+             name="CSV File"
+             documentation="Generic comma-separated values file. Used as both source and target format."/>
+
+    <element xsi:type="archimate:DataObject" id="do-hledger"
+             name="hledger Journal File"
+             documentation="Plain-text .journal file in hledger format."/>
+
+    <element xsi:type="archimate:DataObject" id="do-excel"
+             name="Excel Workbook"
+             documentation=".xlsx file, typically with a named transaction sheet."/>
+
+    <element xsi:type="archimate:DataObject" id="do-twinfield-export"
+             name="Twinfield Export CSV"
+             documentation="CSV export from Twinfield (transaction list or trial balance)."/>
+
+    <element xsi:type="archimate:DataObject" id="do-twinfield-import"
+             name="Twinfield Import CSV"
+             documentation="CSV file formatted for Twinfield batch journal entry import."/>
+
+    <element xsi:type="archimate:DataObject" id="do-duckdb"
+             name="DuckDB Database"
+             documentation=".duckdb file containing a balances table in IR schema."/>
+
+  </elements>
+
+  <!-- ============================================================
+       RELATIONSHIPS
+       ============================================================ -->
+  <relationships>
+
+    <!-- CLI composes Core -->
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-1"
+                  source="comp-cli" target="comp-core"/>
+
+    <!-- Core composes Readers, Writers, Transforms -->
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-2"
+                  source="comp-core" target="comp-readers"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-3"
+                  source="comp-core" target="comp-writers"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-4"
+                  source="comp-core" target="comp-transforms"/>
+
+    <!-- Readers compose sub-readers -->
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-5"
+                  source="comp-readers" target="comp-reader-csv"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-6"
+                  source="comp-readers" target="comp-reader-hledger"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-7"
+                  source="comp-readers" target="comp-reader-excel"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-8"
+                  source="comp-readers" target="comp-reader-twinfield"/>
+
+    <!-- Writers compose sub-writers -->
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-9"
+                  source="comp-writers" target="comp-writer-csv"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-10"
+                  source="comp-writers" target="comp-writer-hledger"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-11"
+                  source="comp-writers" target="comp-writer-excel"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-12"
+                  source="comp-writers" target="comp-writer-twinfield"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-13"
+                  source="comp-writers" target="comp-writer-duckdb"/>
+
+    <!-- Readers produce IR -->
+    <relationship xsi:type="archimate:FlowRelationship" id="rel-14"
+                  source="comp-readers" target="do-ir"/>
+
+    <!-- Writers consume IR -->
+    <relationship xsi:type="archimate:FlowRelationship" id="rel-15"
+                  source="do-ir" target="comp-writers"/>
+
+    <!-- Transforms read and produce IR -->
+    <relationship xsi:type="archimate:FlowRelationship" id="rel-16"
+                  source="do-ir" target="comp-transforms"/>
+    <relationship xsi:type="archimate:FlowRelationship" id="rel-17"
+                  source="comp-transforms" target="do-ir"/>
+
+    <!-- Data object access -->
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-18"
+                  source="comp-reader-csv" target="do-csv" accessType="Read"/>
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-19"
+                  source="comp-reader-hledger" target="do-hledger" accessType="Read"/>
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-20"
+                  source="comp-reader-excel" target="do-excel" accessType="Read"/>
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-21"
+                  source="comp-reader-twinfield" target="do-twinfield-export" accessType="Read"/>
+
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-22"
+                  source="comp-writer-csv" target="do-csv" accessType="Write"/>
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-23"
+                  source="comp-writer-hledger" target="do-hledger" accessType="Write"/>
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-24"
+                  source="comp-writer-excel" target="do-excel" accessType="Write"/>
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-25"
+                  source="comp-writer-twinfield" target="do-twinfield-import" accessType="Write"/>
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-26"
+                  source="comp-writer-duckdb" target="do-duckdb" accessType="Write"/>
+
+  </relationships>
+
+</archimate:model>

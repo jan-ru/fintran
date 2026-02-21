@@ -1,0 +1,4 @@
+# file: /Users/jrm/Projects/fintran/fintran/core/exceptions.py
+# hypothesis_version: 6.151.9
+
+[', ', 'actual_type', 'expected_type', 'field', 'file_path', 'format', 'input_path', 'line_number', 'missing_fields', 'output_path', 'reason', 'step', 'transform_count', 'transform_index', 'transform_name', 'transform_type']

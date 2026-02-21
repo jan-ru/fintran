@@ -1,0 +1,42 @@
+repos:
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.3
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml"]
+
+  - repo: local
+    hooks:
+      - id: ruff-lint
+        name: Ruff linter
+        entry: ruff check --fix
+        language: system
+        types: [python]
+
+      - id: ruff-format
+        name: Ruff formatter
+        entry: ruff format
+        language: system
+        types: [python]
+
+      - id: mypy
+        name: mypy type checker
+        entry: mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+        args: ["fintran"]
+
+      - id: ty-check
+        name: Ty type checker (informational)
+        entry: bash -c 'ty check || true'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: run-tests
+        name: Run all tests
+        entry: python -m pytest --tb=short -q
+        language: system
+        pass_filenames: false
+        always_run: true
