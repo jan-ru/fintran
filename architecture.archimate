@@ -24,6 +24,11 @@
     <element xsi:type="archimate:ApplicationComponent" id="comp-cli"
              name="CLI"
              documentation="Cyclopts-based command-line interface. Entry point for all fintran operations. Accepts --from, --to, input file, and -o output flags."/>
+    <!-- CLI sub-components -->
+    <element xsi:type="archimate:ApplicationComponent" id="comp-cli-config"
+             name="CLI Configuration"
+             documentation="Handles loading, parsing, and validation of JSON/YAML configuration files. Supports CLI argument precedence and component existence validation."/>
+
 
     <element xsi:type="archimate:ApplicationComponent" id="comp-core"
              name="Core"
@@ -79,6 +84,20 @@
              name="DuckDB Writer"
              documentation="Writes the IR to a DuckDB table (default: balances). Supports append and upsert modes."/>
 
+    <!-- Validation Framework -->
+    <element xsi:type="archimate:ApplicationComponent" id="comp-validation"
+             name="Validation_Framework"
+             documentation="Provides business rule validation, data quality checks, and custom validation capabilities beyond basic IR schema validation. Integrates with the pipeline to validate IR DataFrames at any stage."/>
+
+    <!-- Validation sub-components -->
+    <element xsi:type="archimate:ApplicationComponent" id="comp-validation-business"
+             name="BusinessRuleValidators"
+             documentation="Collection of validators for domain-specific constraints: positive amounts for revenue accounts, currency consistency within account groups, date range validation, and balance checks."/>
+
+    <element xsi:type="archimate:ApplicationComponent" id="comp-validation-quality"
+             name="DataQualityValidators"
+             documentation="Collection of validators for data quality issues: duplicate detection (exact and fuzzy), missing value detection with percentages, and outlier detection using statistical methods (z-score, IQR, percentile)."/>
+
     <!-- Application Services -->
     <element xsi:type="archimate:ApplicationService" id="svc-transform"
              name="Transform Service"
@@ -87,6 +106,14 @@
     <element xsi:type="archimate:ApplicationService" id="svc-validate"
              name="Validation Service"
              documentation="Validates IR schema compliance after reading. Rejects malformed input early with a descriptive error."/>
+
+    <element xsi:type="archimate:ApplicationService" id="svc-validation-pipeline"
+             name="ValidationPipeline Service"
+             documentation="Orchestrates execution of multiple validators in sequence. Supports fail-fast and continue modes. Aggregates individual ValidationResults into a comprehensive ValidationReport."/>
+
+    <element xsi:type="archimate:ApplicationService" id="svc-validation-report"
+             name="ValidationReport Service"
+             documentation="Aggregates validation results and generates comprehensive reports with summary statistics, detailed error messages, and severity filtering. Supports JSON export for programmatic access."/>
 
     <!-- Data Objects -->
     <element xsi:type="archimate:DataObject" id="do-ir"
@@ -116,6 +143,22 @@
     <element xsi:type="archimate:DataObject" id="do-duckdb"
              name="DuckDB Database"
              documentation=".duckdb file containing a balances table in IR schema."/>
+    <element xsi:type="archimate:DataObject" id="do-config-file"
+             name="Configuration File"
+             documentation="JSON or YAML file containing reader, writer, transform, and pipeline configuration. Supports CLI argument overrides."/>
+
+    <element xsi:type="archimate:DataObject" id="do-validation-result"
+             name="ValidationResult"
+             documentation="Data object representing the outcome of a single validation check. Contains: is_valid (bool), errors (list), warnings (list), validator_name (str), and metadata (dict with row indices, field names, statistics)."/>
+
+    <element xsi:type="archimate:DataObject" id="do-validation-report"
+             name="ValidationReport"
+             documentation="Data object representing aggregated validation results from multiple validators. Contains: results list, timestamp, total_validators, passed count, failed count, warnings_count. Supports summary generation and severity filtering."/>
+
+    <element xsi:type="archimate:DataObject" id="do-validation-metadata"
+             name="ValidationMetadata"
+             documentation="Data object stored in IR DataFrame metadata containing validation history. Includes: validation stage (pre/post-transform), timestamp, validator versions, configuration used, and ValidationReport. Preserved through Parquet serialization."/>
+
 
   </elements>
 
@@ -192,6 +235,47 @@
                   source="comp-writer-twinfield" target="do-twinfield-import" accessType="Write"/>
     <relationship xsi:type="archimate:AccessRelationship" id="rel-26"
                   source="comp-writer-duckdb" target="do-duckdb" accessType="Write"/>
+
+
+    <!-- CLI composes CLI Configuration -->
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-27"
+                  source="comp-cli" target="comp-cli-config"/>
+
+    <!-- CLI Configuration accesses Configuration File -->
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-28"
+                  source="comp-cli-config" target="do-config-file" accessType="Read"/>
+
+    <!-- Core composes Validation Framework -->
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-29"
+                  source="comp-core" target="comp-validation"/>
+
+    <!-- Validation Framework composes sub-validators -->
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-30"
+                  source="comp-validation" target="comp-validation-business"/>
+    <relationship xsi:type="archimate:CompositionRelationship" id="rel-31"
+                  source="comp-validation" target="comp-validation-quality"/>
+
+    <!-- Validation Framework accesses IR (read-only) -->
+    <relationship xsi:type="archimate:AccessRelationship" id="rel-32"
+                  source="comp-validation" target="do-ir" accessType="Read"/>
+
+    <!-- Validation Framework produces ValidationResult and ValidationReport -->
+    <relationship xsi:type="archimate:FlowRelationship" id="rel-33"
+                  source="comp-validation" target="do-validation-result"/>
+    <relationship xsi:type="archimate:FlowRelationship" id="rel-34"
+                  source="comp-validation" target="do-validation-report"/>
+
+    <!-- Validation Framework produces ValidationMetadata -->
+    <relationship xsi:type="archimate:FlowRelationship" id="rel-35"
+                  source="comp-validation" target="do-validation-metadata"/>
+
+    <!-- ValidatingTransform (in Transforms) uses ValidationPipeline Service -->
+    <relationship xsi:type="archimate:ServingRelationship" id="rel-36"
+                  source="svc-validation-pipeline" target="comp-transforms"/>
+
+    <!-- ValidationPipeline Service uses ValidationReport Service -->
+    <relationship xsi:type="archimate:ServingRelationship" id="rel-37"
+                  source="svc-validation-report" target="svc-validation-pipeline"/>
 
   </relationships>
 

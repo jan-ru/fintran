@@ -51,6 +51,18 @@ This file lists Context7 library IDs for the key dependencies used in this proje
 - **Usage**: Loading database credentials and configuration
 - **Key Features**: Simple API, .env file support
 
+## Architecture & Documentation
+
+### C4 Model
+- **Website**: https://c4model.com
+- **Purpose**: Software architecture visualization methodology
+- **Usage**: fintran uses C4 model for architecture documentation at four levels
+- **Key Features**: Context, Container, Component, and Code level diagrams
+- **Project Documentation**: 
+  - Context diagram: `docs/c4-context.md`
+  - Container diagram: `docs/c4-container.md`
+  - Component diagram: `docs/c4-component.md`
+
 ## How to Use These References
 
 When working with these libraries, you can query Context7 for documentation:

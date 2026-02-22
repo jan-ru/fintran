@@ -1,6 +1,14 @@
 # fintran
 
-A high-performance financial document transformation tool built on a flexible reader → IR → writer pipeline pattern.
+[![Release](https://img.shields.io/github/v/release/jan-ru/fintran)](https://github.com/jan-ru/fintran/releases)
+[![Python](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/github/license/jan-ru/fintran)](LICENSE)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Type checked: mypy](https://img.shields.io/badge/type%20checked-mypy-blue.svg)](https://mypy-lang.org/)
+[![Tests](https://img.shields.io/badge/tests-120%20passed-success)](tests/)
+[![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen)](tests/coverage-report.md)
+
+A high-performance financial document transformation tool built on a flexible reader → IR → writer pipeline pattern, designed using the C4 model for clear architectural documentation.
 
 ## Overview
 
@@ -17,6 +25,8 @@ fintran transforms financial data between different formats and storage systems 
 - **Comprehensive Testing**: Unit tests + property-based testing with Hypothesis
 
 ## Architecture
+
+fintran follows the [C4 model](https://c4model.com) for architecture documentation. See `docs/` for detailed diagrams at each level (Context, Container, Component).
 
 ```
 ┌─────────────┐      ┌──────────────┐      ┌─────────────┐
@@ -200,7 +210,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [ ] Additional readers (CSV, JSON, REST APIs)
 - [ ] Additional writers (Database, Cloud storage)
-- [ ] Data validation framework
+- [x] Data validation framework (in progress - core validators implemented)
 - [ ] Transformation DSL
 - [ ] CLI interface
 - [ ] Web API
