@@ -46,13 +46,15 @@ class ValidationError(FintranError):
 
     This exception is raised by the Validation_Service when a DataFrame
     does not conform to the IR schema requirements (missing required fields,
-    incorrect data types, etc.).
+    incorrect data types, etc.), or by ValidatingTransform when validation
+    pipeline fails in fail-on-error mode.
 
     Context typically includes:
         - field: Name of the problematic field
         - expected_type: Expected data type for the field
         - actual_type: Actual data type found
         - missing_fields: List of missing required fields
+        - validation_report: ValidationReport object (for pipeline failures)
     """
 
     def __init__(
@@ -62,6 +64,7 @@ class ValidationError(FintranError):
         expected_type: str | None = None,
         actual_type: str | None = None,
         missing_fields: list[str] | None = None,
+        validation_report: Any | None = None,
         **extra_context: Any,
     ) -> None:
         """Initialize validation error with schema violation details.
@@ -72,6 +75,7 @@ class ValidationError(FintranError):
             expected_type: Expected data type for the field
             actual_type: Actual data type found in the DataFrame
             missing_fields: List of missing required field names
+            validation_report: ValidationReport object (for pipeline failures)
             **extra_context: Additional context information
         """
         context: dict[str, Any] = {}
@@ -83,9 +87,12 @@ class ValidationError(FintranError):
             context["actual_type"] = actual_type
         if missing_fields is not None:
             context["missing_fields"] = missing_fields
+        if validation_report is not None:
+            context["validation_report"] = validation_report
         context.update(extra_context)
 
         super().__init__(message, context)
+        self.validation_report = validation_report
 
 
 class ReaderError(FintranError):

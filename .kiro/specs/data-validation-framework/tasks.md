@@ -154,8 +154,8 @@ Implementation strategy:
   - Verify Polars vectorized operations are used (no row-by-row iteration)
   - Ensure all tests pass, ask the user if questions arise
 
-- [ ] 7. Implement ValidationPipeline orchestration
-  - [ ] 7.1 Create ValidationMode enum and ValidationPipeline class in `fintran/validation/pipeline.py`
+- [-] 7. Implement ValidationPipeline orchestration
+  - [x] 7.1 Create ValidationMode enum and ValidationPipeline class in `fintran/validation/pipeline.py`
     - Define `ValidationMode` enum with FAIL_FAST and CONTINUE modes
     - Implement `ValidationPipeline.__init__()` accepting validators and mode
     - Implement `ValidationPipeline.run()` to execute validators in sequence
@@ -164,7 +164,7 @@ Implementation strategy:
     - Aggregate results into ValidationReport
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
   
-  - [ ]* 7.2 Write property tests for ValidationPipeline
+  - [x] 7.2 Write property tests for ValidationPipeline
     - **Property 11: ValidationPipeline Execution Order**
     - **Validates: Requirements 10.2, 10.3**
     - Verify validators execute in order and results are in same order
@@ -179,8 +179,8 @@ Implementation strategy:
     - Verify empty pipeline returns success
     - _Requirements: 10.2, 10.3, 10.4, 10.6_
 
-- [ ] 8. Implement ValidationReport
-  - [ ] 8.1 Create ValidationReport dataclass in `fintran/validation/report.py`
+- [x] 8. Implement ValidationReport
+  - [x] 8.1 Create ValidationReport dataclass in `fintran/validation/report.py`
     - Define dataclass with fields: `results`, `timestamp`, `total_validators`, `passed`, `failed`, `warnings_count`
     - Implement `is_valid()` method
     - Implement `summary()` method for summary string
@@ -188,7 +188,7 @@ Implementation strategy:
     - Implement `format()` method with severity filtering
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6_
   
-  - [ ]* 8.2 Write property tests for ValidationReport
+  - [x] 8.2 Write property tests for ValidationReport
     - **Property 15: ValidationReport Summary Accuracy**
     - **Validates: Requirements 11.2**
     - Verify summary counts accurately reflect aggregated results
@@ -200,8 +200,8 @@ Implementation strategy:
     - Verify filtering by severity returns correct results
     - _Requirements: 11.2, 11.4, 11.6_
 
-- [ ] 9. Implement ValidatingTransform for pipeline integration
-  - [ ] 9.1 Create ValidatingTransform class in `fintran/validation/transform.py`
+- [x] 9. Implement ValidatingTransform for pipeline integration
+  - [x] 9.1 Create ValidatingTransform class in `fintran/validation/transform.py`
     - Implement `__init__()` accepting ValidationPipeline, fail_on_error flag, and metadata_key
     - Implement `transform()` method that runs validation and attaches report to IR metadata
     - Support fail-on-error mode (raise ValidationError on failures)
@@ -209,14 +209,14 @@ Implementation strategy:
     - Implement metadata attachment using Polars DataFrame metadata
     - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
   
-  - [ ] 9.2 Implement metadata helper functions
+  - [x] 9.2 Implement metadata helper functions
     - Create `attach_validation_report()` function to store report in IR metadata
     - Create `get_validation_reports()` function to retrieve reports from IR metadata
     - Support multiple validation runs with history (pre-validation, post-validation)
     - Include timestamp, validator versions, and configuration in metadata
     - _Requirements: 22.1, 22.2, 22.3, 22.4_
   
-  - [ ]* 9.3 Write property tests for ValidatingTransform
+  - [x] 9.3 Write property tests for ValidatingTransform
     - **Property 18: ValidatingTransform Metadata Attachment**
     - **Validates: Requirements 12.2, 22.1, 22.3**
     - Verify ValidationReport is attached to IR metadata and retrievable
@@ -225,16 +225,16 @@ Implementation strategy:
     - Verify fail_on_error=True raises ValidationError with report
     - _Requirements: 12.2, 12.3, 22.1, 22.3_
 
-- [ ] 10. Implement custom validator support
-  - [ ] 10.1 Create custom validator helpers in `fintran/validation/custom.py`
+- [x] 10. Implement custom validator support
+  - [x] 10.1 Create custom validator helpers in `fintran/validation/custom.py`
     - Implement `@custom_validator` decorator for creating custom validators
     - Provide helper functions for common validation patterns
     - Provide helper functions for error formatting
     - Document custom validator pattern with examples
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-- [ ] 11. Implement declarative configuration support
-  - [ ] 11.1 Create declarative configuration parser in `fintran/validation/declarative.py`
+- [x] 11. Implement declarative configuration support
+  - [x] 11.1 Create declarative configuration parser in `fintran/validation/declarative.py`
     - Implement `load_validation_config()` function for loading dict/YAML configs
     - Define configuration schema (validator type, params, severity)
     - Implement `parse_config()` to construct ValidationPipeline from config
@@ -242,7 +242,7 @@ Implementation strategy:
     - Support conditional rules
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
   
-  - [ ] 11.2 Implement configuration schema validation
+  - [x] 11.2 Implement configuration schema validation
     - Define schema for declarative configuration
     - Validate configuration against schema on load
     - Raise ConfigurationSchemaError with descriptive messages for violations
@@ -250,7 +250,7 @@ Implementation strategy:
     - Provide function to export schema for documentation
     - _Requirements: 23.1, 23.2, 23.3, 23.4, 23.5_
   
-  - [ ]* 11.3 Write property tests for declarative configuration
+  - [x] 11.3 Write property tests for declarative configuration
     - **Property 20: Declarative Configuration Parsing**
     - **Validates: Requirements 13.3**
     - Verify parsed pipeline behaves equivalently to manually constructed pipeline
@@ -259,41 +259,41 @@ Implementation strategy:
     - Verify invalid configurations raise descriptive errors
     - _Requirements: 13.3, 23.2, 23.3_
 
-- [ ] 12. Implement ValidationRuleSet for reusability
-  - [ ] 12.1 Create ValidationRuleSet class in `fintran/validation/declarative.py`
+- [-] 12. Implement ValidationRuleSet for reusability
+  - [x] 12.1 Create ValidationRuleSet class in `fintran/validation/declarative.py`
     - Implement class for grouping related validators
     - Support loading rules from external files (Python modules or YAML)
     - Support composing multiple rule sets into single ValidationPipeline
     - Support versioning and documentation of rule sets
     - _Requirements: 14.1, 14.2, 14.3, 14.4, 14.5_
   
-  - [ ] 12.2 Create built-in financial validation rule sets
+  - [x] 12.2 Create built-in financial validation rule sets
     - Create rule set for common financial validation patterns
     - Include: positive_amounts, currency_consistency, date_range, balance_check, account_code_format, reference_uniqueness
     - Document each built-in validator with usage examples
     - _Requirements: 21.1, 21.2, 21.3, 21.4_
   
-  - [ ]* 12.3 Write property test for ValidationRuleSet composition
+  - [x] 12.3 Write property test for ValidationRuleSet composition
     - **Property 21: ValidationRuleSet Composition**
     - **Validates: Requirements 14.3**
     - Verify composing rule sets applies all validators in order
     - _Requirements: 14.3_
 
-- [ ] 13. Checkpoint - Verify pipeline and integration
+- [x] 13. Checkpoint - Verify pipeline and integration
   - Test full pipeline integration with ValidatingTransform
   - Verify metadata attachment and retrieval works correctly
   - Test declarative configuration loading and parsing
   - Ensure all tests pass, ask the user if questions arise
 
-- [ ] 14. Implement comprehensive property-based tests
-  - [ ] 14.1 Set up Hypothesis strategies in `tests/validation/conftest.py`
+- [-] 14. Implement comprehensive property-based tests
+  - [x] 14.1 Set up Hypothesis strategies in `tests/validation/conftest.py`
     - Create `valid_ir_dataframe()` strategy for generating random valid IR DataFrames
     - Create `ir_with_violations()` strategy for generating DataFrames with known violations
     - Create `validator_config()` strategy for generating random validator configurations
     - Configure Hypothesis settings (max_examples=100, deadline=None)
     - _Requirements: 17.2, 20.2_
   
-  - [ ]* 14.2 Write validator determinism and immutability tests in `tests/validation/test_validator_properties.py`
+  - [x] 14.2 Write validator determinism and immutability tests in `tests/validation/test_validator_properties.py`
     - **Property 1: Validator Determinism**
     - **Validates: Requirements 1.5, 17.1**
     - Test that applying same validator twice produces equivalent results
@@ -302,7 +302,7 @@ Implementation strategy:
     - Test that validators don't modify input DataFrame (reference and content equality)
     - _Requirements: 1.5, 17.1, 17.2, 17.3, 17.4, 18.1, 18.2, 18.3, 18.4_
   
-  - [ ]* 14.3 Write error message property tests in `tests/validation/test_error_properties.py`
+  - [x] 14.3 Write error message property tests in `tests/validation/test_error_properties.py`
     - **Property 23: Error Message Completeness**
     - **Validates: Requirements 16.1, 16.2, 16.3**
     - Verify error messages contain validator name, row indices, field names, and values
@@ -311,26 +311,26 @@ Implementation strategy:
     - Verify validators detect known failures with appropriate errors
     - _Requirements: 16.1, 16.2, 16.3, 16.4, 16.5, 20.1, 20.2, 20.3, 20.4, 20.5_
   
-  - [ ]* 14.4 Write validator composition property test in `tests/validation/test_composition_properties.py`
+  - [x] 14.4 Write validator composition property test in `tests/validation/test_composition_properties.py`
     - **Property 25: Validator Composition Commutativity**
     - **Validates: Requirements 19.1**
     - Test that independent validators produce same errors/warnings regardless of order
     - _Requirements: 19.1, 19.2, 19.3, 19.4_
   
-  - [ ]* 14.5 Write metadata preservation property test in `tests/validation/test_integration_properties.py`
+  - [x] 14.5 Write metadata preservation property test in `tests/validation/test_integration_properties.py`
     - **Property 27: Metadata Preservation Through Parquet**
     - **Validates: Requirements 22.2, 22.4, 22.5**
     - Test that validation metadata survives Parquet round-trip
     - _Requirements: 22.2, 22.4, 22.5_
   
-  - [ ]* 14.6 Write performance property test in `tests/validation/test_performance_properties.py`
+  - [x] 14.6 Write performance property test in `tests/validation/test_performance_properties.py`
     - **Property 22: Validation Performance Linearity**
     - **Validates: Requirements 15.5**
     - Test that validation time scales linearly with DataFrame size (O(n) complexity)
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5_
 
-- [ ] 15. Write edge case tests
-  - [ ]* 15.1 Create edge case test suite in `tests/validation/test_edge_cases.py`
+- [x] 15. Write edge case tests
+  - [x] 15.1 Create edge case test suite in `tests/validation/test_edge_cases.py`
     - Test validators with empty DataFrames
     - Test validators with single-row DataFrames
     - Test validators with null values, empty strings, NaN, infinity
@@ -339,8 +339,8 @@ Implementation strategy:
     - Verify error messages are descriptive for all failure modes
     - _Requirements: 20.2, 20.3, 20.4, 20.5_
 
-- [ ] 16. Update package exports and documentation
-  - [ ] 16.1 Update `fintran/validation/__init__.py` with public API exports
+- [x] 16. Update package exports and documentation
+  - [x] 16.1 Update `fintran/validation/__init__.py` with public API exports
     - Export Validator protocol
     - Export ValidationResult, ValidationReport
     - Export ValidationPipeline, ValidationMode
@@ -349,15 +349,15 @@ Implementation strategy:
     - Export custom validator helpers
     - Export declarative configuration functions
   
-  - [ ] 16.2 Update `fintran/__init__.py` to include validation module
+  - [x] 16.2 Update `fintran/__init__.py` to include validation module
     - Add validation module to package exports
   
-  - [ ] 16.3 Add docstrings and type hints to all public APIs
+  - [x] 16.3 Add docstrings and type hints to all public APIs
     - Ensure all classes, functions, and methods have comprehensive docstrings
     - Add usage examples to key components
     - Verify type hints are complete and accurate
 
-- [ ] 17. Final checkpoint - Complete validation framework
+- [x] 17. Final checkpoint - Complete validation framework
   - Run full test suite with pytest
   - Verify all 28 property-based tests pass
   - Verify code coverage meets 90%+ target

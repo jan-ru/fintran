@@ -5,8 +5,8 @@
 [![License](https://img.shields.io/github/license/jan-ru/fintran)](LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Type checked: mypy](https://img.shields.io/badge/type%20checked-mypy-blue.svg)](https://mypy-lang.org/)
-[![Tests](https://img.shields.io/badge/tests-120%20passed-success)](tests/)
-[![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen)](tests/coverage-report.md)
+[![Tests](https://img.shields.io/badge/tests-297%20passed-success)](tests/)
+[![Coverage](https://img.shields.io/badge/coverage-96%25-brightgreen)](tests/coverage-report.md)
 
 A high-performance financial document transformation tool built on a flexible reader → IR → writer pipeline pattern, designed using the C4 model for clear architectural documentation.
 
@@ -21,6 +21,7 @@ fintran transforms financial data between different formats and storage systems 
 - **High Performance**: Built on Polars and ConnectorX for fast data processing
 - **Flexible I/O**: Support for multiple data sources (MS SQL Server) and formats (Parquet)
 - **Metadata Preservation**: Embedded metadata in output files for traceability
+- **Data Validation Framework**: Comprehensive validation system with 177 test cases covering schema validation, data quality checks, and business rule enforcement
 - **Type Safety**: Full type hints with mypy validation
 - **Comprehensive Testing**: Unit tests + property-based testing with Hypothesis
 
@@ -182,26 +183,6 @@ def test_ir_roundtrip(df):
     assert_frame_equal(df, result)
 ```
 
-## Contributing
-
-We welcome contributions! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes with tests
-4. Run quality checks (`ruff check`, `mypy`, `pytest`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-### Code Standards
-
-- Follow PEP 8 style guidelines (enforced by ruff)
-- Add type hints to all functions
-- Write tests for new features
-- Update documentation as needed
-- Keep commits atomic and well-described
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -210,9 +191,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [ ] Additional readers (CSV, JSON, REST APIs)
 - [ ] Additional writers (Database, Cloud storage)
-- [x] Data validation framework (in progress - core validators implemented)
+- [x] Data validation framework
 - [ ] Transformation DSL
-- [ ] CLI interface
+- [x] CLI interface
 - [ ] Web API
 - [ ] Performance benchmarks
 - [ ] Docker deployment

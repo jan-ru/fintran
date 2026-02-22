@@ -24,7 +24,7 @@ from fintran.cli import commands
 app = App(
     name="fintran",
     help="Financial document transformation tool",
-    version="0.1.0",
+    version="0.1.4",
 )
 
 # Register subcommands

@@ -1,6 +1,6 @@
 [project]
 name = "fintran"
-version = "0.1.2"
+version = "0.1.4"
 description = "Financial document transformation tool with reader → IR → writer pipeline pattern"
 authors = [
     { name = "fintran team" }
@@ -91,6 +91,9 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+    "performance: marks tests as performance tests (deselect with '-m \"not performance\"')",
+]
 
 [tool.hypothesis]
 max_examples = 100
